@@ -8,60 +8,43 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var sliderRedValue = Double.random(in: 0...255)
-    @State private var sliderGreenValue = Double.random(in: 0...255)
-    @State private var sliderBlueValue = Double.random(in: 0...255)
-    
-    @State private var redInput = ""
-    @State private var greenInput = ""
-    @State private var blueInput = ""
+    @State private var red = Double.random(in: 0...255)
+    @State private var green = Double.random(in: 0...255)
+    @State private var blue = Double.random(in: 0...255)
     
     @FocusState private var focusedField: Bool
     
     var body: some View {
-        let areaColor = Color(red: sliderRedValue/255, green: sliderGreenValue/255, blue: sliderBlueValue/255)
-        
-        ZStack {
-            Color.cyan
-                .ignoresSafeArea()
-            
-            VStack(spacing: 10) {
-                AreaColorView(color: areaColor)
+        NavigationView {
+            ZStack {
+                Color(#colorLiteral(red: 0, green: 0.3765624762, blue: 0.7304599881, alpha: 1)).ignoresSafeArea()
+                
+                VStack(spacing: 40) {
+                    ColorView(red: red, green: green, blue: blue)
                     
-                VStack {
-                    ColorSliderView(value: $sliderRedValue,
-                                    inputValue: $redInput,
-                                    focusedField: _focusedField,
-                                    color: .red)
-                    ColorSliderView(value: $sliderGreenValue,
-                                    inputValue: $greenInput,
-                                    focusedField: _focusedField,
-                                    color: .green)
-                    ColorSliderView(value: $sliderBlueValue,
-                                    inputValue: $blueInput,
-                                    focusedField: _focusedField,
-                                    color: .blue)
-                }
-                .toolbar {
-                    ToolbarItemGroup(placement: .keyboard) {
-                        Spacer()
-                        Button("Done") {
-                            focusedField = false
-                            
-                            sliderRedValue = Double(redInput) ?? sliderRedValue
-                            sliderGreenValue = Double(greenInput) ?? sliderGreenValue
-                            sliderBlueValue = Double(blueInput) ?? sliderBlueValue
+                    VStack {
+                        ColorSliderView(sliderValue: $red, color: .red)
+                        ColorSliderView(sliderValue: $green, color: .green)
+                        ColorSliderView(sliderValue: $blue, color: .blue)
+                    }
+                    .frame(height: 150)
+                    .focused($focusedField)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            Button("Done") {
+                                focusedField = false
+                            }
                         }
                     }
+                    Spacer()
                 }
-                Spacer()
-            }
-            .onTapGesture {
-                self.hideKeyboard()
+                .padding()
             }
         }
     }
 }
+
 
 struct BorderViewModifier: ViewModifier {
     func body(content: Content) -> some View {

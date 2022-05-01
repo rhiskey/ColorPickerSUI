@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct ColorSliderView: View {
+struct SliderColorView: View {
     @Binding var value: Double
     @Binding var inputValue: String
     @FocusState var focusedField: Bool
