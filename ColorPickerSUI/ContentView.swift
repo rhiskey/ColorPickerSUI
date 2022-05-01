@@ -16,9 +16,10 @@ struct ContentView: View {
     @State private var greenInput = ""
     @State private var blueInput = ""
     
+    @FocusState private var focusedField: Bool
     
     var body: some View {
-        let areaColor: Color = Color(red: sliderRedValue/255, green: sliderGreenValue/255, blue: sliderBlueValue/255)
+        let areaColor = Color(red: sliderRedValue/255, green: sliderGreenValue/255, blue: sliderBlueValue/255)
         
         ZStack {
             Color.cyan
@@ -28,62 +29,37 @@ struct ContentView: View {
                 AreaColorView(color: areaColor)
                     
                 VStack {
-                    ColorSliderView(value: $sliderRedValue, inputValue: $redInput, color: .red)
-                    ColorSliderView(value: $sliderGreenValue, inputValue: $greenInput, color: .green)
-                    ColorSliderView(value: $sliderBlueValue, inputValue: $blueInput, color: .blue)
+                    ColorSliderView(value: $sliderRedValue,
+                                    inputValue: $redInput,
+                                    focusedField: _focusedField,
+                                    color: .red)
+                    ColorSliderView(value: $sliderGreenValue,
+                                    inputValue: $greenInput,
+                                    focusedField: _focusedField,
+                                    color: .green)
+                    ColorSliderView(value: $sliderBlueValue,
+                                    inputValue: $blueInput,
+                                    focusedField: _focusedField,
+                                    color: .blue)
                 }
-                
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button("Done") {
+                            focusedField = false
+                            
+                            sliderRedValue = Double(redInput) ?? sliderRedValue
+                            sliderGreenValue = Double(greenInput) ?? sliderGreenValue
+                            sliderBlueValue = Double(blueInput) ?? sliderBlueValue
+                        }
+                    }
+                }
                 Spacer()
             }
+            .onTapGesture {
+                self.hideKeyboard()
+            }
         }
-    }
-}
-
-
-
-struct AreaColorView: View {
-    let color: Color
-    
-    var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(color)
-            .frame(height: 150)
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(lineWidth: 6)
-                    .foregroundColor(.white)
-            )
-            .padding()
-    }
-}
-
-struct ColorSliderView: View {
-    @Binding var value: Double
-    @Binding var inputValue: String
-    @FocusState private var focusedField: Bool
-    
-    let color: Color
-    
-    var body: some View {
-        HStack {
-            Text("\(lround(value))").foregroundColor(.white).frame(width: 40, height: 60)
-            Spacer()
-            Slider(value: $value, in: 0...255, step: 1).accentColor(color)
-            Spacer()
-            TextField("", text: $inputValue)
-                .bordered()
-                .keyboardType(.numberPad)
-                .focused($focusedField)
-                .frame(width: 70, height: 60)
-        }
-//        .toolbar {
-//            ToolbarItem(placement: .keyboard) {
-//                Button("Done") {
-//                    focusedField = false
-//                }
-//            }
-//        }
-        .padding(.horizontal)
     }
 }
 
@@ -93,7 +69,12 @@ struct BorderViewModifier: ViewModifier {
             .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
             .foregroundColor(.black)
-            //.padding()
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
     }
 }
 
@@ -106,8 +87,8 @@ extension TextField {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
